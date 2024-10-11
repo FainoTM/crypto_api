@@ -1,10 +1,7 @@
-
-import 'package:coin_api/viewModel/number_format.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../model/crypto_model.dart';
-
+import 'package:coin_api/viewModel/number_format.dart';
 
 class DetailPage extends StatefulWidget {
   final CryptoModel crypto;
@@ -13,13 +10,36 @@ class DetailPage extends StatefulWidget {
     required this.crypto,
   }) : super(key: key);
 
-
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
-class _DetailPageState extends State<DetailPage> {
+class _DetailPageState extends State<DetailPage> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<Offset> _animation;
 
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(seconds: 2),
+      vsync: this,
+    );
+    _animation = Tween<Offset>(
+      begin: Offset(1.0, 0.0),
+      end: Offset(0.0, 0.0),
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +62,17 @@ class _DetailPageState extends State<DetailPage> {
               SizedBox(
                 height: 10,
               ),
-              SizedBox(width: 300, height: 300, child: Image.network(widget.crypto.image, fit: BoxFit.fill,)),
+              SlideTransition(
+                position: _animation,
+                child: SizedBox(
+                  width: 300,
+                  height: 300,
+                  child: Image.network(
+                    widget.crypto.image,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 10,
               ),
@@ -53,7 +83,6 @@ class _DetailPageState extends State<DetailPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               SizedBox(
                 height: 10,
               ),
@@ -63,7 +92,6 @@ class _DetailPageState extends State<DetailPage> {
                   fontSize: 24,
                 ),
               ),
-
               SizedBox(
                 height: 10,
               ),
@@ -80,7 +108,10 @@ class _DetailPageState extends State<DetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Maior Alta do Dia ', style: TextStyle(fontSize: 24)),
-                  Icon(Icons.arrow_upward, color: Colors.greenAccent,),
+                  Icon(
+                    Icons.arrow_upward,
+                    color: Colors.greenAccent,
+                  ),
                   Text(
                     NumberFormatter().formatNumber(widget.crypto.high.toString()),
                     style: TextStyle(
@@ -97,7 +128,10 @@ class _DetailPageState extends State<DetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Maior Baixa do Dia ', style: TextStyle(fontSize: 24)),
-                  Icon(Icons.arrow_downward, color: Colors.redAccent,),
+                  Icon(
+                    Icons.arrow_downward,
+                    color: Colors.redAccent,
+                  ),
                   Text(
                     NumberFormatter().formatNumber(widget.crypto.low.toString()),
                     style: TextStyle(
